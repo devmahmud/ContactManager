@@ -5,9 +5,9 @@ const Header = props => {
   return (
     <nav className="navbar navbar-expand-sm navbar-dark bg-danger mb-3">
       <div className="container">
-        <a className="navbar-brand" href="/">
+        <Link className="navbar-brand" to="/">
           {props.header}
-        </a>
+        </Link>
 
         <ul className="navbar-nav ml-auto">
           <li className="nav-item">
