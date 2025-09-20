@@ -1,106 +1,115 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import TextInputGroup from "../layout/TextInputGroup";
-import { addContact } from "../../actions/contactActions";
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import TextInputGroup from '../layout/TextInputGroup';
+import LoadingSpinner from '../layout/LoadingSpinner';
+import { addContact } from '../../actions/contactActions';
 
-class AddContact extends Component {
-  state = {
-    name: "",
-    email: "",
-    phone: "",
-    errors: {}
-  };
+function AddContact() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [errors, setErrors] = useState({});
 
-  onSubmit = e => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.contact);
+
+  const onSubmit = (e) => {
     e.preventDefault();
 
-    const { name, email, phone } = this.state;
-
     // Check For Errors
-    if (name === "") {
-      this.setState({ errors: { name: "Name is required" } });
+    if (name === '') {
+      setErrors({ name: 'Name is required' });
       return;
     }
 
-    if (email === "") {
-      this.setState({ errors: { email: "Email is required" } });
+    if (email === '') {
+      setErrors({ email: 'Email is required' });
       return;
     }
 
-    if (phone === "") {
-      this.setState({ errors: { phone: "Phone is required" } });
+    if (phone === '') {
+      setErrors({ phone: 'Phone is required' });
       return;
     }
 
     const newContact = {
       name,
       email,
-      phone
+      phone,
     };
 
     //// SUBMIT CONTACT ////
-    this.props.addContact(newContact);
+    dispatch(addContact(newContact));
 
     // Clear State
-    this.setState({
-      name: "",
-      email: "",
-      phone: "",
-      errors: {}
-    });
+    setName('');
+    setEmail('');
+    setPhone('');
+    setErrors({});
 
     //Redirect to home
-    this.props.history.push("/");
+    navigate('/');
   };
 
-  onChange = e => this.setState({ [e.target.name]: e.target.value });
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'name') setName(value);
+    if (name === 'email') setEmail(value);
+    if (name === 'phone') setPhone(value);
+  };
 
-  render() {
-    const { name, email, phone, errors } = this.state;
-
-    return (
-      <div className="card mb-3">
-        <div className="card-header">Add Contact</div>
-        <div className="card-body">
-          <form onSubmit={this.onSubmit}>
-            <TextInputGroup
-              label="Name"
-              name="name"
-              placeholder="Enter Name"
-              value={name}
-              onChange={this.onChange}
-              error={errors.name}
-            />
-            <TextInputGroup
-              label="Email"
-              name="email"
-              type="email"
-              placeholder="Enter Email"
-              value={email}
-              onChange={this.onChange}
-              error={errors.email}
-            />
-            <TextInputGroup
-              label="Phone"
-              name="phone"
-              placeholder="Enter Phone"
-              value={phone}
-              onChange={this.onChange}
-              error={errors.phone}
-            />
-            <input
-              type="submit"
-              value="Add Contact"
-              className="btn btn-light btn-block"
-            />
-          </form>
-        </div>
+  return (
+    <div className="card mb-3">
+      <div className="card-header">
+        <h4 className="mb-0">Add Contact</h4>
       </div>
-    );
-  }
+      <div className="card-body">
+        <form onSubmit={onSubmit}>
+          <TextInputGroup
+            label="Name"
+            name="name"
+            placeholder="Enter Name"
+            value={name}
+            onChange={onChange}
+            error={errors.name}
+          />
+          <TextInputGroup
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="Enter Email"
+            value={email}
+            onChange={onChange}
+            error={errors.email}
+          />
+          <TextInputGroup
+            label="Phone"
+            name="phone"
+            placeholder="Enter Phone"
+            value={phone}
+            onChange={onChange}
+            error={errors.phone}
+          />
+          <div className="mt-4">
+            <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" text="" />
+                  <span className="ms-2">Adding Contact...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fa fa-plus me-2"></i>Add Contact
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-export default connect(
-  null,
-  { addContact }
-)(AddContact);
+export default AddContact;

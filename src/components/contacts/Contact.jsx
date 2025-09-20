@@ -1,61 +1,105 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
-import { deleteContact } from "../../actions/contactActions";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteContact } from '../../actions/contactActions';
+import ConfirmationModal from '../layout/ConfirmationModal';
 
-class Contact extends Component {
-  state = {
-    showContactInfo: false
+function Contact({ contact }) {
+  const [showContactInfo, setShowContactInfo] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.contact);
+
+  const { id, name, email, phone } = contact;
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
   };
 
-  render() {
-    const { id, name, email, phone } = this.props.contact;
-    return (
-      <div className="card mb-2">
-        <div className="card-header">
-          <h4>
-            {name}
-            <i
-              className="fa fa-sort-down ml-2"
-              style={{ cursor: "pointer" }}
-              onClick={() =>
-                this.setState({
-                  showContactInfo: !this.state.showContactInfo
-                })
-              }
-            ></i>
-            <i
-              className="fa fa-times"
-              style={{ cursor: "pointer", float: "right", color: "red" }}
-              onClick={() => this.props.deleteContact(id)}
-            ></i>
-            <Link to={`contact/edit/${id}`}>
-              <i
-                className="fa fa-pencil"
-                style={{
-                  cursor: "pointer",
-                  float: "right",
-                  color: "black",
-                  marginRight: "1rem"
-                }}
-              />
-            </Link>
-          </h4>
-        </div>
-        {this.state.showContactInfo ? (
-          <div className="card-body">
-            <ul className="list-group">
-              <li className="list-group-item">Email: {email}</li>
-              <li className="list-group-item">Phone: {phone}</li>
-            </ul>
+  const handleDeleteConfirm = async () => {
+    setShowDeleteModal(false);
+    setDeleting(true);
+    await dispatch(deleteContact(id));
+    setDeleting(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+  };
+
+  return (
+    <>
+      <div className="card mb-3 shadow-sm">
+        <div className="card-header bg-light">
+          <div className="d-flex justify-content-between align-items-center">
+            <h5 className="mb-0 fw-bold text-primary">
+              <i className="fa fa-user me-2"></i>
+              {name}
+            </h5>
+            <div className="d-flex gap-2">
+              <button
+                className="btn btn-sm btn-outline-primary"
+                onClick={() => setShowContactInfo(!showContactInfo)}
+                title={showContactInfo ? 'Hide details' : 'Show details'}
+              >
+                <i className={`fa fa-chevron-${showContactInfo ? 'up' : 'down'}`}></i>
+              </button>
+              <Link
+                to={`contact/edit/${id}`}
+                className="btn btn-sm btn-outline-warning"
+                title="Edit contact"
+              >
+                <i className="fa fa-pencil"></i>
+              </Link>
+              <button
+                className={`btn btn-sm ${
+                  deleting ? 'btn-outline-secondary' : 'btn-outline-danger'
+                }`}
+                onClick={deleting ? undefined : handleDeleteClick}
+                disabled={deleting}
+                title={deleting ? 'Deleting...' : 'Delete contact'}
+              >
+                <i className={`fa ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
+              </button>
+            </div>
           </div>
-        ) : null}
+        </div>
+        {showContactInfo && (
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-6">
+                <div className="d-flex align-items-center mb-2">
+                  <i className="fa fa-envelope text-muted me-2"></i>
+                  <span className="fw-medium">Email:</span>
+                  <span className="ms-2">{email}</span>
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="d-flex align-items-center mb-2">
+                  <i className="fa fa-phone text-muted me-2"></i>
+                  <span className="fw-medium">Phone:</span>
+                  <span className="ms-2">{phone}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    );
-  }
+
+      <ConfirmationModal
+        show={showDeleteModal}
+        onHide={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Contact"
+        message={`Are you sure you want to delete "${name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        loading={deleting}
+      />
+    </>
+  );
 }
 
-export default connect(
-  null,
-  { deleteContact }
-)(Contact);
+export default Contact;
