@@ -12,13 +12,24 @@
   <link rel="stylesheet"
     href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Contact Manager</title>
-  <script type="module" crossorigin src="/ContactManager/assets/index-BZ6lIpMW.js"></script>
-  <link rel="stylesheet" crossorigin href="/ContactManager/assets/index-rnX5tJ1I.css">
+  <script>
+    // GitHub Pages 404 redirect for client-side routing
+    var pathSegmentsToKeep = 1;
+    var l = window.location;
+    l.replace(
+      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+      l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+      l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      l.hash
+    );
+  </script>
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+  <script type="module" src="/ContactManager/src/index.jsx"></script>
 </body>
 
 </html>
