@@ -180,7 +180,25 @@ export const addContact = (contact) => async (dispatch) => {
 npm run dev      # Start development server
 npm run build    # Build for production
 npm run preview  # Preview production build
+npm run deploy   # Deploy to GitHub Pages
 ```
+
+## 🌐 Deployment
+
+### GitHub Pages
+The application is configured for automatic deployment to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+**Live Demo**: [https://devmahmud.github.io/ContactManager](https://devmahmud.github.io/ContactManager)
+
+### Deployment Features
+- ✅ **Automatic Build** - Builds before deployment
+- ✅ **Client-side Routing** - 404.html handles React Router
+- ✅ **Asset Optimization** - Proper base path configuration
+- ✅ **Jekyll Bypass** - .nojekyll file prevents Jekyll processing
 
 ## 🌐 API Integration
 
